@@ -1,4 +1,48 @@
 import urllib.request
 import urllib.parse
 import json
+import re
 from bs4 import BeautifulSoup
+
+def spider_page(html):
+    page=urllib.request.urlopen(html).read().decode('utf-8')
+    return page
+
+def pattern(html):
+    pattern=re.compile('<table width.*?href="(.*?)"  title="(.*?)">.*?pl">(.*?)</p>.*?nums">(.*?)</span>.*?</table>',re.S)
+    items=pattern.findall(html)
+    for item in items:
+        yield {
+            'name':item[1],
+            'url':item[0],
+            'actors':item[2],
+            'score':item[3]
+        }
+
+def pattern2(html):
+    pattern=re.compile('<span property.*?viewed">(.*?)</span>.*?<span property.*?summary">(.*?)</span>',re.S)
+    items=pattern.findall(html)
+    for item in items:
+        print(item)
+        yield {
+            'name':item[0],
+            'summary':item[1]
+        }
+
+def save_to_txt(content):
+    f=open('1.txt','a',encoding='utf-8')
+    f.write(json.dumps(content,ensure_ascii=False)+'\n')
+    f.close()
+
+def main():
+    url='https://movie.douban.com/chart'
+    html=spider_page(url)
+    # print(html)
+    for item in pattern(html):
+        h=spider_page(item['url'])
+        print(h)
+        # for i in pattern2(h):
+            # save_to_txt(item,i)
+
+if  __name__=='__main__':
+    main()
