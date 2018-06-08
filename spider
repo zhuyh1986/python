@@ -36,16 +36,11 @@ def save_to_txt(*content):
     f.close()
 
 def main(item):
-    # url='https://movie.douban.com/chart'
-    # html=spider_page(url)
-    # for item in pattern(html):
-    #     h=spider_page(item['url'])
     h=spider_page(item['url'])
     for i in pattern2(h):
         save_to_txt(item,i)
 
 if  __name__=='__main__':
-    # main()
     start=time.perf_counter()
     url='https://movie.douban.com/chart'
     html=spider_page(url)
