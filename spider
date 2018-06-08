@@ -2,7 +2,9 @@ import urllib.request
 import urllib.parse
 import json
 import re
+from multiprocessing import Pool
 from bs4 import BeautifulSoup
+import time
 
 def spider_page(html):
     page=urllib.request.urlopen(html).read().decode('utf-8')
@@ -20,29 +22,34 @@ def pattern(html):
         }
 
 def pattern2(html):
-    pattern=re.compile('<span property.*?viewed">(.*?)</span>.*?<span property.*?summary">(.*?)</span>',re.S)
+    pattern=re.compile('<span.*?viewed">(.*?)</span>.*?<span property="v.summary" class="">\s*(.*?)</span>',re.S)
     items=pattern.findall(html)
     for item in items:
-        print(item)
         yield {
-            'name':item[0],
-            'summary':item[1]
+            '名字':item[0],
+            '简介':item[1].strip()
         }
 
-def save_to_txt(content):
+def save_to_txt(*content):
     f=open('1.txt','a',encoding='utf-8')
     f.write(json.dumps(content,ensure_ascii=False)+'\n')
     f.close()
 
-def main():
-    url='https://movie.douban.com/chart'
-    html=spider_page(url)
-    # print(html)
-    for item in pattern(html):
-        h=spider_page(item['url'])
-        print(h)
-        # for i in pattern2(h):
-            # save_to_txt(item,i)
+def main(item):
+    # url='https://movie.douban.com/chart'
+    # html=spider_page(url)
+    # for item in pattern(html):
+    #     h=spider_page(item['url'])
+    h=spider_page(item['url'])
+    for i in pattern2(h):
+        save_to_txt(item,i)
 
 if  __name__=='__main__':
-    main()
+    # main()
+    start=time.perf_counter()
+    url='https://movie.douban.com/chart'
+    html=spider_page(url)
+    pool=Pool()
+    pool.map(main,[item for item in pattern(html)])
+    end=time.perf_counter()
+    print(end-start)
