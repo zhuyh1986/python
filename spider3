@@ -1,0 +1,86 @@
+import urllib.request
+import urllib.parse
+import re
+import os
+import json
+from http import cookiejar
+
+# code=input('请输入验证码：')
+# data={
+#     'form_email':18621120625,
+#     'form_password':'1986zenus',
+#     'captcha-solution':code
+# }
+# postdata=urllib.parse.urlencode(data).encode('utf-8')
+# cookie=cookiejar.CookieJar()
+# handler=urllib.request.HTTPCookieProcessor(cookie)
+# opener=urllib.request.build_opener(handler)
+# response=opener.open('https://www.douban.com/accounts/login',postdata).read().decode('utf-8')
+# # req=urllib.request.Request('https://www.douban.com/accounts/login',postdata)
+# # response=urllib.request.urlopen(req).read().decode('utf-8')
+# pattern=re.compile('<a.*?href="(.*?)">(.*?)</a>',re.S)
+# response1=pattern.findall(response)
+# for i in response1:
+#     print(i)
+
+def get_page(url,id):
+    code=input('请输入验证码：')
+    data={
+        'captcha-id':id,
+        'captcha-solution':code,
+        'form_email':'18621120625',
+        'form_password':'1986zenus',
+        'login':'登录',
+        'redir':'https://movie.douban.com/',
+        'source':'movie'
+    }
+    postdata=urllib.parse.urlencode(data).encode('utf-8')
+    req=urllib.request.Request(url,data=postdata)
+    cookie=cookiejar.CookieJar()
+    handler=urllib.request.HTTPCookieProcessor(cookie)
+    opener=urllib.request.build_opener(handler)
+    response=opener.open(req).read().decode('utf-8')
+    # print(response)
+    # down_code(response)
+    return response
+    # pattern=re.compile('<img.*?captcha_image.*?src="(.*?)".*?/>',re.S)
+    # patterns=pattern.findall(response)
+    # for i in patterns:
+    #     print(i)
+
+def pattern(response):
+    pattern=re.compile('<a.*?bn-more.*?<span>(.*?)</span>',re.S)
+    response1=pattern.findall(response)
+    for i in response1:
+        print(i)
+
+def get(url):
+    response=urllib.request.urlopen(url).read()
+    # print(response)
+    return response
+
+def down_code():
+    url='https://www.douban.com/j/misc/captcha'
+    res=get(url)
+    j=json.loads(res)
+    id=j['token']
+    print(id)
+    print(j['url'])
+    j1=get('https:'+j['url'])
+    f=open('code.png','wb')
+    f.write(j1)
+    f.close
+    return id
+
+def main():
+    # page=get(url)
+    # down_code(page)
+    # get_page(url)
+    id=down_code()
+    response=get_page(url,id)
+    pattern(response)
+
+
+url='https://accounts.douban.com/login'
+if __name__=='__main__':
+    main()
