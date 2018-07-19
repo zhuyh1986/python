@@ -1,0 +1,37 @@
+import requests
+import re
+from bs4 import BeautifulSoup
+
+def get_url(url):
+    res=requests.get(url)
+    res.encoding='gbk'
+    return res.text
+
+def parse_res(res,url):
+    soup=BeautifulSoup(res,'html.parser')
+    # titles=soup.select('tr td')
+    pattern=re.compile('新电影下载')
+    titles=soup.find_all('a',text=pattern)
+    # print(titles)
+    for title in titles:
+        t=title.next_sibling.next_sibling
+        # print(t.string,url+t['href'])
+        t1=t.string
+        t2=url+t['href']
+        # yield t1,t2
+        yield t1,t2
+
+def parse_res_detail(res):
+    soup=BeautifulSoup(res,'html.parser')
+    titles=soup.select()
+
+def main():
+    url='http://www.dytt8.net'
+    res=get_url(url)
+    for i in parse_res(res,url):
+        print(i)
+        res_detail=get_url(i[1])
+
+
+if __name__=='__main__':
+    main()
