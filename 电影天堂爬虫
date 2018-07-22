@@ -23,7 +23,14 @@ def parse_res(res,url):
 
 def parse_res_detail(res):
     soup=BeautifulSoup(res,'html.parser')
-    titles=soup.select()
+    titles=soup.find_all('font',text=re.compile('《'))
+    # print(titles)
+    t=re.compile('.*?《(.*?)》.*?')
+    for title in titles:
+        print(t.findall(title.string)[0])
+    downs=soup.find('td',style="WORD-WRAP: break-word")
+    down=downs.find('a')
+    print(down.get('href'))
 
 def main():
     url='http://www.dytt8.net'
@@ -31,6 +38,7 @@ def main():
     for i in parse_res(res,url):
         print(i)
         res_detail=get_url(i[1])
+        parse_res_detail(res_detail)
 
 
 if __name__=='__main__':
